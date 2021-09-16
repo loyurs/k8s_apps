@@ -1,0 +1,36 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: task-pv-pod
+spec:
+  initContainers:
+  - command:
+    - sh
+    - -c
+    - echo "I am InitContainer for init some configuration"
+    image: matlab:beta2
+    imagePullPolicy: IfNotPresent
+    name: init-container
+  volumes:
+    - name: task-pv-storage
+      persistentVolumeClaim:
+       claimName: matlab-pvc-claim
+  containers:
+  - name: task-pv-container
+    image: matlab:beta2
+#    command: ["matlab", "-batch", "plat"]   #已经封装到了
+    imagePullPolicy: IfNotPresent
+    resources:
+      limits:
+        cpu: 5000m
+        memory: 4000Mi
+      requests:
+        cpu: 5000m
+        memory: 4000Mi
+    volumeMounts:
+      - mountPath: "/mnt/"
+        name: task-pv-storage
+  restartPolicy: Never
+
+
+

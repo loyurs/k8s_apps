@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    job-name: myjob
+  name: run_matlab
+  namespace: default
+spec:
+  #ttlSecondsAfterFinished: 100
+  backoffLimit: 1
+  completions: 1
+  parallelism: 1
+  template:
+    spec:
+      volumes:
+      - name: code-path
+        persistentVolumeClaim: # pvc 数据卷
+          claimName: matlab-pvc-claim
+      containers:
+     # - command: ["matlab", "-batch", "plat"]
+      - name: myjob
+        image: matlab:beta2
+        imagePullPolicy: IfNotPresent
+        volumeMounts: # 和volumes中的name 名字要对的上
+        - name: code-path
+          mountPath: "/mnt/"
+      restartPolicy: Never

@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    job-name: myjob
+  name: echo
+  namespace: default
+spec:
+  #ttlSecondsAfterFinished: 100
+  ttlSecondsAfterFinished: 0  #执行结束立即删除
+  backoffLimit: 1        #失败多少次不执行
+  completions: 1        #完成几个job视为完成
+  parallelism: 1      # 并发数量
+  template:
+    spec:
+      volumes:
+      - name: code-path
+        persistentVolumeClaim:
+          claimName: matlab-pvc-claim
+      containers:
+     # - command: ["matlab", "-batch", "plat"]
+      - name: myjob
+        image: matlab:beta2
+        imagePullPolicy: IfNotPresient
+        volumeMounts: # 和volumes中的name 名字要对的上
+          - name: code-path
+            mountPath: "/mnt/"
+      restartPolicy: Never
